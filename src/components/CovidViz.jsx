@@ -3,25 +3,41 @@ import React, { useState, useEffect } from "react";
 const CovidViz = () => {
   const [countries, setCountries] = useState([]);
   const [input, setInput] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleInput = (e) => {
     const newInput = e.target.value;
     setInput(newInput);
   };
 
+  const messageShow = () => {
+    if (message.length > 0) {
+      return (
+        <div>
+          {message}
+        </div>
+      )
+    }
+  }
+
   useEffect(() => {
     fetch("https://api.covid19api.com/summary")
       .then((res) => res.json())
       .then((data) => {
-        data.Countries.sort((countryA, countryB) => {
-          return countryB.NewConfirmed - countryA.NewConfirmed;
-        });
-        setCountries(data.Countries);
+        if (data.Countries) {
+          data.Countries.sort((countryA, countryB) => {
+            return countryB.NewConfirmed - countryA.NewConfirmed;
+          });
+          setCountries(data.Countries);
+        } else {
+          setMessage(data.Message)
+        }
       });
   }, [setCountries]);
 
   return (
     <>
+      {messageShow()}
       <input
         type="text"
         value={input}
